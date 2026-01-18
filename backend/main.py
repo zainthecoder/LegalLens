@@ -24,8 +24,9 @@ from models import User, Plan, ChatSession
 async def lifespan(app: FastAPI):
     # Startup: Initialize MongoDB
     client = await init_db()
+    db_name = os.getenv("DATABASE_NAME", "legal_lens")
     # Initialize Beanie with all models
-    await init_beanie(database=client.get_database("legal_lens"), document_models=[User, Plan, ChatSession])
+    await init_beanie(database=client.get_database(db_name), document_models=[User, Plan, ChatSession])
     yield
     # Shutdown: (Optional) Close connection if needed, though Motor handles this well.
 
