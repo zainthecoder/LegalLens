@@ -1,6 +1,8 @@
 import { writable } from 'svelte/store';
 import { plan } from './plan';
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function createAuthStore() {
     const { subscribe, set, update } = writable({
         isAuthenticated: false,
@@ -17,7 +19,7 @@ function createAuthStore() {
             formData.append('password', password);
 
             try {
-                const res = await fetch('http://localhost:8000/api/auth/token', {
+                const res = await fetch(`${API_URL}/api/auth/token`, {
                     method: 'POST',
                     body: formData
                 });
@@ -28,7 +30,7 @@ function createAuthStore() {
                 const token = data.access_token;
 
                 // Get User Details
-                const userRes = await fetch('http://localhost:8000/api/auth/me', {
+                const userRes = await fetch(`${API_URL}/api/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const user = await userRes.json();
@@ -50,7 +52,7 @@ function createAuthStore() {
         },
         register: async (email, password) => {
             try {
-                const res = await fetch('http://localhost:8000/api/auth/register', {
+                const res = await fetch(`${API_URL}/api/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -70,7 +72,7 @@ function createAuthStore() {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    const userRes = await fetch('http://localhost:8000/api/auth/me', {
+                    const userRes = await fetch(`${API_URL}/api/auth/me`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (userRes.ok) {

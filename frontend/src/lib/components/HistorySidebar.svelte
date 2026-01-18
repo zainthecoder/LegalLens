@@ -5,6 +5,8 @@
 
   export let isOpen = false;
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
   let plans = [];
   let loading = false;
 
@@ -12,7 +14,7 @@
     if (!$auth.token) return;
     loading = true;
     try {
-      const res = await fetch("http://localhost:8000/api/plans", {
+      const res = await fetch(`${API_URL}/api/plans`, {
         headers: { Authorization: `Bearer ${$auth.token}` },
       });
       if (res.ok) {
@@ -28,7 +30,7 @@
   async function selectPlan(planId) {
     if (!$auth.token) return;
     try {
-      const res = await fetch(`http://localhost:8000/api/plans/${planId}`, {
+      const res = await fetch(`${API_URL}/api/plans/${planId}`, {
         headers: { Authorization: `Bearer ${$auth.token}` },
       });
       if (res.ok) {
@@ -56,7 +58,7 @@
     if (!confirm("Are you sure you want to delete this strategy?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8000/api/plans/${planId}`, {
+      const res = await fetch(`${API_URL}/api/plans/${planId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${$auth.token}` },
       });
