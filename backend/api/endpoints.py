@@ -43,7 +43,10 @@ async def save_and_stream(
     ai_content = ""
     tool_call_args = ""
     
-    async for chunk_str in stream_chat(chat_request.messages):
+    # Serialize current plan for context
+    plan_context = json.dumps(plan.model_dump(include={"title", "steps"}), indent=2)
+    
+    async for chunk_str in stream_chat(chat_request.messages, plan_context):
         yield chunk_str
         
         # Parse chunk to accumulate
@@ -57,6 +60,9 @@ async def save_and_stream(
             pass
             
     # 4. Save AI Message & Execute Tool
+    if not ai_content and tool_call_args:
+        ai_content = "Strategy updated."
+
     ai_msg = {
         "role": "assistant", 
         "content": ai_content,

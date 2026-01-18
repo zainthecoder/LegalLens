@@ -114,14 +114,31 @@
       }
 
       // Attempt to update plan if we received tool args
+      // Attempt to update plan if we received tool args
       if (toolArgsBuffer.trim()) {
         try {
           const planData = JSON.parse(toolArgsBuffer);
           console.log("Updating plan with:", planData);
-          plan.set(planData);
+
+          plan.update((p) => ({
+            ...p,
+            ...planData,
+            updatedAt: new Date().toISOString(),
+          }));
+
+          // If no text response, add a placeholder
+          if (!assistantMessage.content.trim()) {
+            assistantMessage.content =
+              "I've updated the strategy plan based on your request.";
+            messages = [...messages.slice(0, -1), assistantMessage];
+          }
         } catch (e) {
-          // console.error("Error parsing final tool args:", e);
+          console.error("Error parsing final tool args:", e);
         }
+      } else if (!assistantMessage.content.trim()) {
+        // No text and no tool args?
+        assistantMessage.content = "(No response received)";
+        messages = [...messages.slice(0, -1), assistantMessage];
       }
     } catch (error) {
       console.error("Error:", error);

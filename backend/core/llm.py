@@ -55,12 +55,16 @@ TOOLS = [
     }
 ]
 
-async def stream_chat(messages: List[Dict[str, str]]):
-    # Add system prompt
-    full_messages = [{"role": "system", "content": SYSTEM_PROMPT}] + messages
+async def stream_chat(messages: List[Dict[str, str]], plan_context: str = ""):
+    # Add system prompt with context
+    final_system_prompt = SYSTEM_PROMPT
+    if plan_context:
+        final_system_prompt += f"\n\nCURRENT PLAN CONTENT:\n{plan_context}\n"
+    
+    full_messages = [{"role": "system", "content": final_system_prompt}] + messages
 
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=full_messages,
         tools=TOOLS,
         stream=True
