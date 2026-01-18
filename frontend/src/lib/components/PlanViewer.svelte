@@ -113,12 +113,6 @@
               >
                 Legal Strategy
               </div>
-              <span class="text-xs text-muted-foreground font-mono"
-                >ID: #{Math.random()
-                  .toString(36)
-                  .substr(2, 6)
-                  .toUpperCase()}</span
-              >
             </div>
 
             <h1
@@ -198,17 +192,6 @@
                     >
                       {step.title}
                     </h3>
-                    <!-- Status Badge -->
-                    <div
-                      class="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-sm border
-                                {step.status === 'done'
-                        ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
-                        : step.status === 'in-progress'
-                          ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800'
-                          : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}"
-                    >
-                      {step.status}
-                    </div>
                   </div>
 
                   {#if step.description}
