@@ -6,6 +6,9 @@
   import ChatInterface from "./lib/components/ChatInterface.svelte";
   import PlanViewer from "./lib/components/PlanViewer.svelte";
   import Login from "./lib/components/Login.svelte";
+  import HistorySidebar from "./lib/components/HistorySidebar.svelte";
+
+  let isSidebarOpen = false;
 
   onMount(() => {
     auth.init();
@@ -26,7 +29,8 @@
       <Login />
     </div>
   {:else}
-    <Navbar />
+    <HistorySidebar bind:isOpen={isSidebarOpen} />
+    <Navbar on:toggleSidebar={() => (isSidebarOpen = !isSidebarOpen)} />
     <div class="flex-1 overflow-hidden">
       <SplitView>
         <div slot="left" class="h-full">

@@ -16,14 +16,16 @@ api_key = os.environ.get("OPENAI_API_KEY")
 
 from api.endpoints import router as chat_router
 from api.auth import router as auth_router
+from api.plans import router as plans_router
 from core.database import init_db
-from models import User, Plan
+from models import User, Plan, ChatSession
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Initialize MongoDB
     client = await init_db()
-    await init_beanie(database=client.get_database("legal_lens"), document_models=[User, Plan])
+    # Initialize Beanie with all models
+    await init_beanie(database=client.get_database("legal_lens"), document_models=[User, Plan, ChatSession])
     yield
     # Shutdown: (Optional) Close connection if needed, though Motor handles this well.
 
@@ -38,8 +40,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat_router, prefix="/api")
-app.include_router(auth_router, prefix="/api/auth")
+app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
+app.include_router(chat_router, prefix="/api", tags=["Chat"])
+app.include_router(plans_router, prefix="/api/plans", tags=["Plans"])
+
 
 @app.get("/")
 async def root():

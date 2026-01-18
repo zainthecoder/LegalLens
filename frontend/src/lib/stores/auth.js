@@ -5,80 +5,82 @@ function createAuthStore() {
         isAuthenticated: false,
         user: null,
         token: null,
-        isLoading: true
+        loading: true
     });
 
     return {
         subscribe,
+        login: async (email, password) => {
+            const formData = new FormData();
+            formData.append('username', email);
+            formData.append('password', password);
+
+            try {
+                const res = await fetch('http://localhost:8000/api/auth/token', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!res.ok) throw new Error('Login failed');
+
+                const data = await res.json();
+                const token = data.access_token;
+
+                // Get User Details
+                const userRes = await fetch('http://localhost:8000/api/auth/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const user = await userRes.json();
+
+                // Save to local storage
+                localStorage.setItem('token', token);
+
+                set({ isAuthenticated: true, user, token, loading: false });
+                return true;
+            } catch (e) {
+                console.error(e);
+                return false;
+            }
+        },
+        logout: () => {
+            localStorage.removeItem('token');
+            set({ isAuthenticated: false, user: null, token: null, loading: false });
+        },
+        register: async (email, password) => {
+            try {
+                const res = await fetch('http://localhost:8000/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || 'Registration failed');
+                }
+                return true;
+            } catch (e) {
+                console.error(e);
+                throw e;
+            }
+        },
         init: async () => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    // Validate token with backend
-                    const res = await fetch('http://localhost:8000/api/auth/me', {
-                        headers: { Authorization: `Bearer ${token}` }
+                    const userRes = await fetch('http://localhost:8000/api/auth/me', {
+                        headers: { 'Authorization': `Bearer ${token}` }
                     });
-
-                    if (res.ok) {
-                        const user = await res.json();
-                        set({ isAuthenticated: true, user, token, isLoading: false });
-                    } else {
-                        // Token invalid/expired
-                        localStorage.removeItem('token');
-                        set({ isAuthenticated: false, user: null, token: null, isLoading: false });
+                    if (userRes.ok) {
+                        const user = await userRes.json();
+                        set({ isAuthenticated: true, user, token, loading: false });
+                        return;
                     }
                 } catch (e) {
-                    console.error("Auth init error", e);
-                    set({ isAuthenticated: false, user: null, token: null, isLoading: false });
+                    console.error(e);
                 }
-            } else {
-                set({ isAuthenticated: false, user: null, token: null, isLoading: false });
             }
-        },
-        login: async (email, password) => {
-            const formData = new FormData();
-            formData.append('username', email); // OAuth2PasswordRequestForm expects username
-            formData.append('password', password);
-
-            const res = await fetch('http://localhost:8000/api/auth/token', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || 'Login failed');
-            }
-
-            const data = await res.json(); // { access_token, token_type }
-            const token = data.access_token;
-            localStorage.setItem('token', token);
-
-            // Get User Details
-            const userRes = await fetch('http://localhost:8000/api/auth/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const user = await userRes.json();
-
-            set({ isAuthenticated: true, user, token, isLoading: false });
-        },
-        register: async (email, password) => {
-            const res = await fetch('http://localhost:8000/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.detail || 'Registration failed');
-            }
-            // After register, you can auto-login or ask user to login
-            return await res.json();
-        },
-        logout: () => {
-            localStorage.removeItem('token');
-            set({ isAuthenticated: false, user: null, token: null, isLoading: false });
+            set({ isAuthenticated: false, user: null, token: null, loading: false });
         }
     };
 }

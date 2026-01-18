@@ -101,7 +101,17 @@
   }
 </script>
 
-<div class="flex flex-col h-full bg-muted/10">
+<div class="flex flex-col h-full bg-muted/10 relative">
+  <!-- Header -->
+  <div
+    class="px-4 py-3 border-b border-border bg-card/50 backdrop-blur flex items-center justify-between sticky top-0 z-10"
+  >
+    <h2 class="font-semibold text-sm text-foreground truncate max-w-[70%]">
+      {$plan?.title || "New Strategy"}
+    </h2>
+    <span class="text-xs text-muted-foreground">Session Active</span>
+  </div>
+
   <div class="flex-1 p-4 overflow-y-auto space-y-4">
     {#if messages.length === 0}
       <div
@@ -129,7 +139,19 @@
             ? 'bg-primary text-primary-foreground rounded-tr-none'
             : 'bg-card text-card-foreground border border-border rounded-tl-none'}"
         >
-          <strong>{m.role === "user" ? "You" : "LegalLens"}:</strong>
+          <div
+            class="font-semibold text-xs mb-1 opacity-90 flex justify-between gap-4"
+          >
+            <span>{m.role === "user" ? "You" : "LegalLens"}</span>
+            {#if m.timestamp}
+              <span class="font-normal opacity-70 text-[10px]"
+                >{new Date(m.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}</span
+              >
+            {/if}
+          </div>
           {m.content}
         </div>
       </div>
@@ -139,13 +161,13 @@
       <div
         class="self-start bg-card text-card-foreground p-3 rounded-lg rounded-tl-none border border-border text-sm flex items-center gap-2"
       >
-        <div class="w-2 h-2 bg-primary/50 rounded-full animate-bounce" />
+        <div class="w-2 h-2 bg-primary/50 rounded-full animate-bounce"></div>
         <div
           class="w-2 h-2 bg-primary/50 rounded-full animate-bounce [animation-delay:0.2s]"
-        />
+        ></div>
         <div
           class="w-2 h-2 bg-primary/50 rounded-full animate-bounce [animation-delay:0.4s]"
-        />
+        ></div>
       </div>
     {/if}
   </div>
