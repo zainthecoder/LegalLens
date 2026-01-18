@@ -64,7 +64,7 @@ async def stream_chat(messages: List[Dict[str, str]], plan_context: str = ""):
     full_messages = [{"role": "system", "content": final_system_prompt}] + messages
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=full_messages,
         tools=TOOLS,
         stream=True
