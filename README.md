@@ -4,7 +4,7 @@
 
 LegalLens is a full-stack AI application designed to help legal professionals and individuals act as an intelligent co-pilot for structuring complex legal strategies. It features a split-view interface with a context-aware AI chat on the left and a live, structured plan document on the right.
 
-![LegalLens Main Interface](docs/screenshot.png) *(Add a screenshot here)*
+![LegalLens Main Interface](docs/legallenselive.png) *(Add a screenshot here)*
 
 ## 🔴 Live Demo
 
