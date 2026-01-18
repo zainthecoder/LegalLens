@@ -9,4 +9,3 @@ beanie>=1.25.0
 pyjwt==2.8.0
 bcrypt
 python-multipart==0.0.9
-python-jose[cryptography]
