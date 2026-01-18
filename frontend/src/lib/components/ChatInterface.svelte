@@ -2,6 +2,8 @@
   import Button from "../ui/Button.svelte";
   import Input from "../ui/Input.svelte";
   import { plan } from "../stores/plan.js";
+  import { auth } from "../stores/auth.js";
+  import { get } from "svelte/store";
 
   let messages = [];
   let input = "";
@@ -17,10 +19,12 @@
     isLoading = true;
 
     try {
+      const token = get(auth).token;
       const response = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ messages: messages }),
       });
