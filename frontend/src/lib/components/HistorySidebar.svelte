@@ -51,6 +51,30 @@
     }
   }
 
+  async function deletePlan(planId, event) {
+    if (event) event.stopPropagation();
+    if (!confirm("Are you sure you want to delete this strategy?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/plans/${planId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${$auth.token}` },
+      });
+
+      if (res.ok) {
+        plans = plans.filter((p) => (p.id || p._id) !== planId);
+
+        // If the deleted plan was the active one, clear the view
+        const activePlanId = $plan.id || $plan._id;
+        if (activePlanId === planId) {
+          window.dispatchEvent(new CustomEvent("reset-session"));
+        }
+      }
+    } catch (e) {
+      console.error("Failed to delete plan:", e);
+    }
+  }
+
   // Reload plans when sidebar opens
   $: if (isOpen && $auth.isAuthenticated) {
     loadPlans();
@@ -91,19 +115,41 @@
     {:else}
       <div class="flex-1 overflow-y-auto space-y-2">
         {#each plans as p}
-          <button
-            on:click={() => selectPlan(p.id || p._id)}
-            class="w-full text-left p-3 rounded-lg hover:bg-muted transition-colors border border-transparent hover:border-border group"
-          >
-            <div
-              class="font-medium text-sm text-foreground group-hover:text-primary truncate"
+          <div class="group relative flex items-center">
+            <button
+              on:click={() => selectPlan(p.id || p._id)}
+              class="w-full text-left p-3 pr-8 rounded-lg hover:bg-muted transition-colors border border-transparent hover:border-border"
             >
-              {p.title}
-            </div>
-            <div class="text-xs text-muted-foreground">
-              {new Date(p.updated_at).toLocaleDateString()}
-            </div>
-          </button>
+              <div class="font-medium text-sm text-foreground truncate">
+                {p.title}
+              </div>
+              <div class="text-xs text-muted-foreground">
+                {new Date(p.updated_at).toLocaleDateString()}
+              </div>
+            </button>
+
+            <button
+              on:click={(e) => deletePlan(p.id || p._id, e)}
+              class="absolute right-2 opacity-0 group-hover:opacity-100 p-1.5 text-muted-foreground hover:text-destructive transition-all rounded-md hover:bg-destructive/10"
+              title="Delete Strategy"
+              aria-label="Delete Strategy"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M3 6h18" /><path
+                  d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"
+                /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg
+              >
+            </button>
+          </div>
         {/each}
       </div>
     {/if}

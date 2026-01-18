@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { auth } from "../stores/auth";
+  import { plan } from "../stores/plan";
 
   const dispatch = createEventDispatcher();
 
@@ -88,7 +89,9 @@
 
   <div class="flex items-center gap-4">
     <div class="text-sm text-muted-foreground hidden md:block">
-      Case: <span class="text-foreground font-medium">New Strategy</span>
+      Case: <span class="text-foreground font-medium"
+        >{$plan?.title || "New Strategy"}</span
+      >
     </div>
 
     <div class="flex items-center gap-3">

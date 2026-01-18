@@ -27,3 +27,18 @@ async def get_plan_details(plan_id: PydanticObjectId, current_user: User = Depen
         "plan": plan,
         "chat_history": chat_session.messages if chat_session else []
     }
+
+@router.delete("/{plan_id}")
+async def delete_plan(plan_id: PydanticObjectId, current_user: User = Depends(get_current_user)):
+    """Delete a plan and its associated chat session."""
+    plan = await Plan.find_one(Plan.id == plan_id, Plan.user_id == current_user.id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    # Delete associated chat session
+    await ChatSession.find_many(ChatSession.plan_id == plan.id).delete()
+    
+    # Delete the plan
+    await plan.delete()
+    
+    return {"message": "Plan deleted successfully"}
