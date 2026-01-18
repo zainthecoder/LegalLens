@@ -7,12 +7,36 @@
   plan.subscribe((value) => {
     currentPlan = value;
   });
+
+  function handleExport() {
+    if (!currentPlan) return;
+
+    // Store original title
+    const originalTitle = document.title;
+
+    // Set title to Plan Title (sanitized) for the PDF filename
+    if (currentPlan.title) {
+      document.title = currentPlan.title;
+    }
+
+    // Print
+    window.print();
+
+    // Restore original title after a short delay to ensure print dialog caught it
+    // Note: window.print() blocks execution in many browsers until dialog closes,
+    // but a small timeout is safer for non-blocking implementations.
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 100);
+  }
 </script>
 
-<div class="h-full flex flex-col bg-slate-50/50 dark:bg-slate-950/20">
-  <!-- Toolbar -->
+<div
+  class="h-full flex flex-col bg-slate-50/50 dark:bg-slate-950/20 print:bg-white"
+>
+  <!-- Toolbar - Hide on print -->
   <div
-    class="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-8 flex items-center justify-between flex-shrink-0 z-10"
+    class="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-8 flex items-center justify-between flex-shrink-0 z-10 print:hidden"
   >
     <h2 class="font-semibold text-lg flex items-center gap-2">
       <span class="text-primary text-xl">📄</span>
@@ -23,6 +47,7 @@
     </h2>
     <div class="flex gap-3">
       <button
+        on:click={handleExport}
         class="text-xs font-medium px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
       >
         Export PDF
@@ -31,7 +56,9 @@
   </div>
 
   <!-- Scrollable Content -->
-  <div class="flex-1 overflow-y-auto p-6 md:p-10">
+  <div
+    class="flex-1 overflow-y-auto p-6 md:p-10 print:overflow-visible print:h-auto print:block"
+  >
     <div class="max-w-3xl mx-auto">
       {#if !currentPlan || !currentPlan.title}
         <div
