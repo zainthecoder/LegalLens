@@ -10,6 +10,9 @@ async def init_db():
     mongodb_url = os.getenv("MONGODB_URL")
     if not mongodb_url:
         raise ValueError("MONGODB_URL environment variable is not set")
+    
+    # Strip whitespace just in case
+    mongodb_url = mongodb_url.strip()
 
     client = AsyncIOMotorClient(mongodb_url, tlsCAFile=certifi.where())
     database = client.get_database("legal_lens")
