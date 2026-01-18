@@ -4,15 +4,46 @@
   import { plan } from "../stores/plan.js";
   import { auth } from "../stores/auth.js";
   import { get } from "svelte/store";
+  import { onMount, onDestroy } from "svelte";
 
   let messages = [];
   let input = "";
   let isLoading = false;
+  let planId = null;
+
+  function handleLoadSession(event) {
+    const data = event.detail;
+    planId = data.plan._id;
+    messages = data.chat_history || [];
+    // Scroll to bottom?
+  }
+
+  function handleResetSession() {
+    planId = null;
+    messages = [];
+    plan.set({ title: "", steps: [] });
+  }
+
+  onMount(() => {
+    window.addEventListener("load-session", handleLoadSession);
+    window.addEventListener("reset-session", handleResetSession);
+  });
+
+  onDestroy(() => {
+    if (typeof window !== "undefined") {
+      window.removeEventListener("load-session", handleLoadSession);
+      window.removeEventListener("reset-session", handleResetSession);
+    }
+  });
 
   async function handleSubmit() {
     if (!input.trim() || isLoading) return;
 
-    const userMessage = { role: "user", content: input };
+    const userMessage = {
+      role: "user",
+      content: input,
+      timestamp: new Date().toISOString(),
+    };
     messages = [...messages, userMessage];
     const messageInput = input;
     input = "";
@@ -20,20 +51,30 @@
 
     try {
       const token = get(auth).token;
+
+      const payload = { messages: messages };
+      if (planId) {
+        payload.plan_id = planId;
+      }
+
       const response = await fetch("http://localhost:8000/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ messages: messages }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error("Network response was not ok");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let assistantMessage = { role: "assistant", content: "" };
+      let assistantMessage = {
+        role: "assistant",
+        content: "",
+        timestamp: new Date().toISOString(),
+      };
       let toolArgsBuffer = "";
 
       // Speculatively add assistant message to UI
@@ -50,7 +91,15 @@
           if (!line.trim()) continue;
           try {
             const data = JSON.parse(line);
-            if (data.type === "text") {
+            if (data.type === "meta") {
+              // Capture plan ID from new session
+              if (!planId) {
+                planId = data.plan_id;
+                console.log("Set active plan ID:", planId);
+                // Also update URL without reload?
+                // navigate(`?plan=${planId}`) // Maybe later
+              }
+            } else if (data.type === "text") {
               // Update the last message content
               assistantMessage.content += data.content;
               messages = [...messages.slice(0, -1), assistantMessage];
@@ -70,25 +119,10 @@
           const planData = JSON.parse(toolArgsBuffer);
           console.log("Updating plan with:", planData);
           plan.set(planData);
-
-          // Optional: Add a system message saying plan was updated
-          // messages = [...messages, { role: 'system', content: 'Plan updated.' }];
         } catch (e) {
-          console.error("Error parsing final tool args:", e);
-          console.error("Buffer was:", toolArgsBuffer);
+          // console.error("Error parsing final tool args:", e);
         }
       }
-
-      // Re-fetch plan if tool was called?
-      // Or in this MVP, let's assume the LLM includes the plan in the text or
-      // we handle tool execution on client?
-      // The architecture plan said "Backend calls tool".
-      // But my backend implementation `stream_chat` yields tool chunks.
-      // Let's update backend to execute tool
-      // OR implement parsing here.
-      // Parsing streaming tool calls in custom code is hard.
-      // Let's stick to text chat for Step 1 verification,
-      // THEN fixing tool execution if needed.
     } catch (error) {
       console.error("Error:", error);
       messages = [

@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { plan } from './plan';
 
 function createAuthStore() {
     const { subscribe, set, update } = writable({
@@ -44,6 +45,7 @@ function createAuthStore() {
         },
         logout: () => {
             localStorage.removeItem('token');
+            plan.set({ id: '', title: '', steps: [], updatedAt: '' });
             set({ isAuthenticated: false, user: null, token: null, loading: false });
         },
         register: async (email, password) => {

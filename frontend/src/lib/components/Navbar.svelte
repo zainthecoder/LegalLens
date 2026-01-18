@@ -58,9 +58,31 @@
           /></svg
         >
       </div>
-      <h1 class="font-playfair text-xl font-semibold text-foreground">
+      <h1 class="font-playfair text-xl font-semibold text-foreground mr-6">
         LegalLens
       </h1>
+
+      <!-- New Strategy Button -->
+      <button
+        on:click={() => {
+          window.dispatchEvent(new CustomEvent("reset-session"));
+        }}
+        class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 rounded-full transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path d="M5 12h14" /><path d="M12 5v14" /></svg
+        >
+        New Strategy
+      </button>
     </div>
   </div>
 
