@@ -8,11 +8,12 @@ load_dotenv()
 async def init_db():
     # Retrieve the MongoDB connection string from environment variables
     mongodb_url = os.getenv("MONGODB_URL")
-    if not mongodb_url:
-        raise ValueError("MONGODB_URL environment variable is not set")
     
-    # Strip whitespace just in case
-    mongodb_url = mongodb_url.strip()
+    # Strip whitespace and quotes just in case
+    mongodb_url = mongodb_url.strip().strip('"').strip("'")
+
+    if not mongodb_url.startswith("mongodb"):
+        print(f"CRITICAL: Invalid MONGODB_URL. Starts with: '{mongodb_url[:8]}...' Check your Render Dashboard.")
 
     client = AsyncIOMotorClient(mongodb_url, tlsCAFile=certifi.where())
     database = client.get_database("legal_lens")
