@@ -2,11 +2,23 @@
   import { createEventDispatcher } from "svelte";
   import { auth } from "../stores/auth";
   import { plan } from "../stores/plan";
+  import SampleStrategiesModal from "./SampleStrategiesModal.svelte";
 
   const dispatch = createEventDispatcher();
 
+  let isSamplesOpen = false;
+
   function handleLogout() {
     auth.logout();
+  }
+
+  function handleUseStrategy(event) {
+    // We need to inject this into the ChatInterface input.
+    // Since they are siblings/far apart, dispatching to window or a store is easiest for now.
+    // Let's use a custom window event that ChatInterface listens to.
+    window.dispatchEvent(
+      new CustomEvent("inject-prompt", { detail: event.detail }),
+    );
   }
 </script>
 
@@ -84,6 +96,28 @@
         >
         New Strategy
       </button>
+
+      <!-- Samples Button -->
+      <button
+        on:click={() => (isSamplesOpen = true)}
+        class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-full transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><rect width="18" height="18" x="3" y="3" rx="2" /><path
+            d="M9 3v18"
+          /><path d="m14 9 3 3-3 3" /></svg
+        >
+        Samples
+      </button>
     </div>
   </div>
 
@@ -123,4 +157,9 @@
       </button>
     </div>
   </div>
+
+  <SampleStrategiesModal
+    bind:isOpen={isSamplesOpen}
+    on:useStrategy={handleUseStrategy}
+  />
 </nav>

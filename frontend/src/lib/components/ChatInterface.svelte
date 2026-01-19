@@ -24,15 +24,24 @@
     plan.set({ title: "", steps: [] });
   }
 
+  function handleInjectPrompt(event) {
+    input = event.detail;
+    // Optional: auto-submit
+    // handleSubmit();
+    // But letting user review first is often better UX.
+  }
+
   onMount(() => {
     window.addEventListener("load-session", handleLoadSession);
     window.addEventListener("reset-session", handleResetSession);
+    window.addEventListener("inject-prompt", handleInjectPrompt);
   });
 
   onDestroy(() => {
     if (typeof window !== "undefined") {
       window.removeEventListener("load-session", handleLoadSession);
       window.removeEventListener("reset-session", handleResetSession);
+      window.removeEventListener("inject-prompt", handleInjectPrompt);
     }
   });
 
