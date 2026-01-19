@@ -5,7 +5,7 @@ from beanie import Document, Link, PydanticObjectId
 
 # --- Pydantic Models (Schemas for API) ---
 class ChatRequest(BaseModel):
-    messages: List[Dict[str, str]]
+    messages: List[Dict]
     plan_id: Optional[str] = None # Optional: ID of existing plan to continue
 
 # --- Beanie Documents (MongoDB Collections) ---

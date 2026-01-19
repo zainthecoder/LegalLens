@@ -65,7 +65,14 @@ async def stream_chat(messages: List[Dict[str, str]], plan_context: str = ""):
     if plan_context:
         final_system_prompt += f"\n\nCURRENT PLAN CONTENT:\n{plan_context}\n"
     
-    full_messages = [{"role": "system", "content": final_system_prompt}] + messages
+    full_messages = [{"role": "system", "content": final_system_prompt}]
+    
+    # Filter messages to only include role and content (remove timestamp, etc)
+    for m in messages:
+        full_messages.append({
+            "role": m.get("role"),
+            "content": m.get("content")
+        })
 
     response = client.chat.completions.create(
         model="gpt-4o",
