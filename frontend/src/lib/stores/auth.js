@@ -62,6 +62,8 @@ function createAuthStore() {
                     const errorData = await res.json();
                     throw new Error(errorData.detail || 'Registration failed');
                 }
+                // Reset tour for new user
+                localStorage.removeItem("legallens-tour-completed");
                 return true;
             } catch (e) {
                 console.error(e);

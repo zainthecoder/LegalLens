@@ -32,6 +32,7 @@
 </script>
 
 <div
+  id="tour-plan"
   class="h-full flex flex-col bg-slate-50/50 dark:bg-slate-950/20 print:bg-white"
 >
   <!-- Toolbar - Hide on print -->

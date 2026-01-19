@@ -7,6 +7,7 @@
   import PlanViewer from "./lib/components/PlanViewer.svelte";
   import Login from "./lib/components/Login.svelte";
   import HistorySidebar from "./lib/components/HistorySidebar.svelte";
+  import Tour from "./lib/components/Tour.svelte";
 
   let isSidebarOpen = false;
 
@@ -41,5 +42,6 @@
         </div>
       </SplitView>
     </div>
+    <Tour />
   {/if}
 </main>

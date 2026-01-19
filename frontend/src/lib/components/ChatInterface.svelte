@@ -234,7 +234,7 @@
     {/if}
   </div>
 
-  <div class="p-4 border-t border-border bg-background">
+  <div class="p-4 border-t border-border bg-background" id="tour-input">
     <form on:submit|preventDefault={handleSubmit} class="flex gap-2">
       <Input
         bind:value={input}

@@ -28,6 +28,7 @@
   <div class="flex items-center gap-4">
     <!-- Menu Button -->
     <button
+      id="tour-sessions"
       on:click={() => dispatch("toggleSidebar")}
       class="p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
     >
@@ -77,6 +78,7 @@
 
       <!-- New Strategy Button -->
       <button
+        id="tour-new-strategy"
         on:click={() => {
           window.dispatchEvent(new CustomEvent("reset-session"));
         }}
@@ -99,6 +101,7 @@
 
       <!-- Samples Button -->
       <button
+        id="tour-samples"
         on:click={() => (isSamplesOpen = true)}
         class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-muted rounded-full transition-colors"
       >
